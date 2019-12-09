@@ -10,14 +10,23 @@
 
 //if not comment use define
 // set comment not use options
-#define VERSION "0.3"
+#define VERSION "0.4"
 //#define LOCATION "Saloon"
 // debug program
-//#define DEBUG
+//#define DEBUG_SW
+/*
+#ifdef DEBUG_SW
+#define DEBUG Serial.print
+#define DEBUGLN Serial.println
+#else
+#define DEBUG
+#define DEBUGLN
+#endif
+*/
 // add function Alexa system
 //#define ALEXA
 //add WebPage WiFi scan
-//#define WEBPAGEWIFISCAN
+#define WEBPAGEWIFISCAN
 //add WebPage button set switch
 #define WEBPAGESWITCH
 //set static IP ( no DHCP)

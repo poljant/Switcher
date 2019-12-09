@@ -1,5 +1,5 @@
 
-#define DEBUG_OUT Serial
+//#define DEBUG_OUT Serial
 #define PRINTSTREAM_FALLBACK
 #include "Debug.hpp"
 #include <Arduino.h>
@@ -54,7 +54,7 @@ bool button_state = false;
 //const char* ap_ssid = hostname().c_str();   // SSID AP
 //const char* ap_pass = "12345678";  // password do AP
 int ap_channel = 7; //numer kanału dla AP
-String version = "0.3";
+String version = VERSION;
 
 
 
@@ -125,7 +125,7 @@ void WiFiconnect(void) {
 	while ((WiFi.status() != WL_CONNECTED) && (i <= 20)) { //  czekaj na połączenie z wifi
 		delay(500);
 		i += 1;
-		DEBUG(".");
+		Serial.print(".");
 	}
 
 	if (i>=0){
