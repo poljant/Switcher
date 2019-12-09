@@ -1,3 +1,4 @@
+
 /*
  * WebPagers.cpp
  *
@@ -6,15 +7,15 @@
  */
 #define DEBUG_OUT Serial
 #define PRINTSTREAM_FALLBACK
-#include "Debug.hpp"
+#include "../Switcher/Debug.hpp"
 //#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
 //#include <EEPROM.h>
-#include "Switcher.h"
+#include "../Switcher/Switcher.h"
 #include "Relay.h"
 #ifdef ALEXA
-#include "Alexa.h"
+#include "../Switcher/Alexa.h"
 #endif
 extern Relay r;
 #ifdef THERMOMETER

@@ -1,16 +1,16 @@
 
 //#define DEBUG_OUT Serial
 #define PRINTSTREAM_FALLBACK
-#include "Debug.hpp"
+#include "../Switcher/Debug.hpp"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 //#include <ESP8266mDNS.h>
 #include <functional>
 //#include <EEPROM.h>
-#include "WebPagers.h"
+#include "../Switcher/WebPagers.h"
 #include <Relay.h>	//https:/github.com/poljant/relay
-#include "Switcher.h"
+#include "../Switcher/Switcher.h"
 #include <ArduinoOTA.h>
 #include "secrets.h"
 #ifdef THERMOMETER
@@ -24,7 +24,7 @@ DallasTemperature sensors(&oneWire);
 
 
 #ifdef ALEXA
-#include "Alexa.h"
+#include "../Switcher/Alexa.h"
 //extern void serverAlexa();
 extern void UdpMulticastServerLoop();
 //	#include "Switch.h"

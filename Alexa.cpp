@@ -1,3 +1,4 @@
+
 /*
  * Alexa.cpp
  *
@@ -7,7 +8,7 @@
  */
 #define DEBUG_OUT Serial
 #define PRINTSTREAM_FALLBACK
-#include "Debug.hpp"
+#include "../Switcher/Debug.hpp"
 #include <ESP8266WiFi.h>
 #include <ESP8266WiFiSTA.h>
 #include <ESP8266WebServer.h>
@@ -15,7 +16,7 @@
 #include <cstdio>
 #include <pgmspace.h>
 #include <Relay.h>
-#include "Switcher.h"
+#include "../Switcher/Switcher.h"
 
 
 extern ESP8266WebServer server;
