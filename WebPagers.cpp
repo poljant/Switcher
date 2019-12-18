@@ -5,21 +5,18 @@
  *  Created on: 6 lis 2019
  *      Author: jant
  */
-#define DEBUG_OUT Serial
-#define PRINTSTREAM_FALLBACK
-#include "../Switcher/Debug.hpp"
+//#define DEBUG_OUT Serial
+//#define PRINTSTREAM_FALLBACK
+//#include "Debug.hpp"
 //#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
 //#include <EEPROM.h>
 #include "../Switcher/Switcher.h"
 #include "Relay.h"
-#ifdef ALEXA
-#include "../Switcher/Alexa.h"
-#endif
+
 extern Relay r;
 #ifdef THERMOMETER
-//extern void ReadTemp();
 extern float temp;
 #endif
 // login i hasło do sytemu (dla update)
@@ -37,9 +34,6 @@ const char* encrypType[] = {"OPEN", "WEP", "WPA", "WPA2", "WPA_WPA2"};
 const int port = 80;                 // port serwera www
 ESP8266WebServer server(port);
 ESP8266HTTPUpdateServer httpUpdate;
-#ifdef ALEXA
-extern void	 serverAlexa();
-#endif
 
 //unsigned int ilM=10;
 unsigned long fminutes( unsigned int ile) {
@@ -101,7 +95,7 @@ String t = F("<h1>");
 #endif
 	t += ( (r.isOn()) ? F("<p><a href = \"/relay/0\"><button class=\"btn btn-danger\">Switch is ON</button></a></p>\n") \
 	    : F("<p><a href = \"/relay/1\"><button class=\"btn btn-success\">Switch is OFF</button></a></p>\n"));
-	t += F("<p><a href = \"/index.html\"><button class=\"btn btn-info\">Reload</button></a></p>");
+	t += F("<p><a href = \"/\"><button class=\"btn btn-info\">Reload</button></a></p>");
 
  return t;
 }
@@ -203,11 +197,11 @@ String HTMLWiFiScan1(void){
 #ifdef POLISH
 	 p += F("<input style=\"text-align: center;color: black;\" type=\"submit\" value=\"Połącz z WiFi.\"/></form>"
 	  "<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Skanuj ponownie</button></a></p>"
-      "<p><a href = \"/indfex.html\"><button class=\"btn btn-info\">Strona główna</button></a></p>");
+      "<p><a href = \"/\"><button class=\"btn btn-info\">Strona główna</button></a></p>");
 #else
      p += F("<input style=\"text-align: center;color: black;\" type=\"submit\" value=\"Connect.\"/></form>"
       "<p><a href = \"/wifiscan\"><button class=\"btn btn-info\">Scan again</button></a></p>"
-	  "<p><a href = \"/index.html\"><button class=\"btn btn-info\">Home</button></a></p>");
+	  "<p><a href = \"/\"><button class=\"btn btn-info\">Home</button></a></p>");
 #endif
 	return p;
 }
@@ -216,27 +210,14 @@ String WebPageScan(){
 }
 #endif
  String WebPage() {       // połącz wszystkie części strony www
-//#ifdef THERMOMETER
-//
-//		ReadTemp();
-//#endif
+
   return (HTMLHeader()+HTMLPage1()+HTMLFooter());
  }
-/* void handleRoot(){
-   server->send(200, "text/plain", F("You should tell Alexa to discover devices"));
- }*/
 // funkcja ustawia wszystkie strony www
 void setservers() {
-
 	httpUpdate.setup(&server, "/update", www_login, www_pass); // umożliwia aktualizację poprzez WiFi
 
 	server.on("/", []() {      // odświerz stronę www
-
-
-				server.send(200, "text/html", F("You should tell Alexa to discover devices"));
-			});
-
-	server.on("/index.html", []() {      // odświerz stronę www
 
 
 				server.send(200, "text/html", WebPage());
@@ -258,6 +239,11 @@ void setservers() {
 			{
 				r.setOn();
 				server.send(200, "text/html", WebPage());
+			});
+	server.on("/get", []()      // pobierz dane
+			{
+
+				server.send(200, "text/html", ((r.isOn() ? "1, " : "0, ")+String(temp)));
 			});
 //  /// WEBPAGEWIFISCAN
 #ifdef WEBPAGEWIFISCAN
@@ -289,27 +275,19 @@ void setservers() {
 
 				int it = 20;//ustal maksymalny czas czekania na 10sek.(20x500ms)
 				while ((WiFi.status() != WL_CONNECTED and it>0)) { //  czekaj na połączenie z WiFi
-//				BEDUG(".");
+
 					delay(500);
 					it--;
 				}
-//			}else{
-			if (it<=0) {
-				DEBUG( F("Błąd w ESSID lub Epass."));
-				DEBUGVAL(WiFi.status());
-				DEBUGVAL(ssid);
-				DEBUGVAL(pass);
-			};
+
 		};
 		server.send(200, "text/html", WebPageScan());
 	});
 #endif
-#ifdef ALEXA
-	 serverAlexa();
-#endif
+
 /////end WEBPAGEWIFISCAN
 	server.begin();                // Start serwera www
-	DEBUG(F("Server started"));
+//	DEBUG(F("Server started"));
 }
 
 

@@ -1,7 +1,7 @@
 
 //#define DEBUG_OUT Serial
-#define PRINTSTREAM_FALLBACK
-#include "../Switcher/Debug.hpp"
+//#define PRINTSTREAM_FALLBACK
+//#include "Debug.hpp"
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
@@ -11,7 +11,7 @@
 #include "../Switcher/WebPagers.h"
 #include <Relay.h>	//https:/github.com/poljant/relay
 #include "../Switcher/Switcher.h"
-#include <ArduinoOTA.h>
+
 #include "secrets.h"
 #ifdef THERMOMETER
 #include <DallasTemperature.h>
@@ -21,22 +21,16 @@ float temp;
 OneWire oneWire(pinOW);
 DallasTemperature sensors(&oneWire);
 #endif
-
-
-#ifdef ALEXA
-#include "../Switcher/Alexa.h"
-//extern void serverAlexa();
-extern void UdpMulticastServerLoop();
-//	#include "Switch.h"
-//	#include "UpnpBroadcastResponder.h"
+/*
+#ifdef USEOTA
+#include <ArduinoOTA.h>
 #endif
+*/
 
 #ifndef WEBPAGEWIFISCAN
 #include <WiFiManager.h>
 #endif
-//	bool isswitcherOn = false;
-//	bool switcherOn();
-//	bool switcherOff();
+
 extern ESP8266WebServer server;
 
 Relay r;
@@ -68,23 +62,7 @@ IPAddress IPadr(10,110,3,86); //stały IP
 IPAddress netmask(255,255,0,0);
 IPAddress gateway(10,110,0,1);
 //////////////////////////////
-/*
-#ifdef ALEXA
-bool switcherOn(void) {
-   DEBUG(F("Switch turn on ..."));
-    r.setOn();
-    isswitcherOn = true;
-    return isswitcherOn;
-}
 
-bool switcherOff() {
-    DEBUG(F("Switch turn off ..."));
-    r.setOff();
-    isswitcherOn = false;
-    return isswitcherOn;
-}
-#endif
-*/
 //format bytes
 String formatBytes(size_t bytes){
   if (bytes < 1024){
@@ -101,13 +79,7 @@ String formatBytes(size_t bytes){
 bool readtemperature;
 unsigned long timestart;
 unsigned long timeread;
-/*void ReadTemp(){
-	sensors.requestTemperatures(); //uruchom odczyt czyjników temperatury
-	delay(750);
-	temp = sensors.getTempCByIndex(0); //czytaj temperaturę w ºC
-	//temp = sensors.getTempC((uint8_t*)AddrTempIn);  //czytaj temperaturę w ºC
-//return
-}*/
+
 #endif
 void WiFiconnect(void) {
 
@@ -130,14 +102,14 @@ void WiFiconnect(void) {
 
 	if (i>=0){
 	Serial.println("");
-	DEBUG(F("WiFi connected"));
-	DEBUGVAL(WiFi.localIP());          // IP server
-	DEBUGVAL(WiFi.macAddress());      // MAC address
+	Serial.print(F("WiFi connected"));
+	Serial.println(WiFi.localIP());          // IP server
+//	Serial.println(WiFi.macAddress());      // MAC address
 	}else{
 		WiFi.mode(WIFI_AP_STA);
 		WiFi.begin();
-		DEBUG( F("WiFi not connect"));
-		DEBUGVAL(WiFi.status());
+		Serial.print( F("WiFi not connect : "));
+		Serial.println(WiFi.status());
 	}
 
 }
@@ -166,13 +138,6 @@ void Button(void) {
 #endif
 //
 /*
-#ifdef ALEXA
-
-	UpnpBroadcastResponder upnpBroadcastResponder;
-
-	Switch *switcher = NULL;
-#endif
-*/
 #ifdef USEOTA
 void Set_OTA(){
 	  ArduinoOTA.setHostname(hostname().c_str());
@@ -199,6 +164,7 @@ void Set_OTA(){
 //	  DEBUG("OTA ready");
 }
 #endif
+*/
 void setup() {
 
 	Serial.begin(115200);
@@ -209,7 +175,7 @@ void setup() {
 #ifdef WEBPAGEWIFISCAN
 	WiFiconnect();
 #else
-//#include <WiFiManager.h>
+#include <WiFiManager.h>
   WiFiManager wifiManager;
 //   //wifiManager.resetSettings();
 #ifdef IP_STATIC
@@ -219,60 +185,40 @@ void setup() {
   delay(100);
 #endif
 
-	DEBUGVAL(hostname());
+/*	DEBUGVAL(hostname());
 	DEBUGVAL(String(WiFi.macAddress()));
 	DEBUGVAL(hostname());
-	DEBUGVAL(WiFi.localIP());
+	DEBUGVAL(WiFi.localIP());*/
 	r.begin(RELAY_PIN);
 	led.begin(LED_PIN, true);
+    setservers();
+
 /*
-#ifdef THERMOMETER
-	ReadTemp();
-#endif
-*/
-
-#ifdef ALEXA
-	serverUdp();
-//    upnpBroadcastResponder.beginUdpMulticast();
-    // Define your switches here. Max 10
-    // Format: Alexa invocation name, local port no, on callback, off callback
- //   switcher = new Switch(HOSTNAME, 80, switcherOn, switcherOff);
-    //switcher = new Switch("switcher", 80, switcherOn, switcherOff);
- //   upnpBroadcastResponder.addDevice(*switcher);
- //   	DEBUG(F("Adding switches upnp broadcast responder"));
-#endif
-
-
-	setservers();
-
 #ifdef USEOTA
 //	 ArduinoOTA.setHostname(hostname().c_str());
 	Set_OTA();
 #endif
+*/
 }
 ;
 
 void loop() {
 	server.handleClient();
+/*
 #ifdef USEOTA
 	ArduinoOTA.handle();
 #endif
-
-#ifdef ALEXA
-//UdpMulticastServerLoop();
-//  upnpBroadcastResponder.serverLoop();
-//  switcher->serverLoop();
-#endif
+*/
 
 #ifdef BUTTON
 	Button();
 #endif
 	if (WiFi.status() != WL_CONNECTED) {
 		WiFi.mode(WIFI_AP_STA); //tryb AP+STATION
-		led.setOff(); // włącz LED gdy nie jest połączenie z WiFi
+		led.setOn(); // włącz LED gdy nie jest połączenie z WiFi
 	} else {
 		WiFi.mode(WIFI_STA); //tryb STATION
-		led.setOn(); // wyłącz LED gdy jest połączenie z WiFi
+		led.setOff(); // wyłącz LED gdy jest połączenie z WiFi
 	}
 #ifdef THERMOMETER
 	if(!readtemperature and millis()>timestart){
@@ -286,10 +232,7 @@ void loop() {
 		readtemperature = false;
 	}
 #endif
-#ifdef ALEXA
-//	UdpMulticastServerLoop();   //UDP multicast receiver
-#endif
-//	server.handleClient();      //Webserver
+
 // MDNS.update();
 }
 

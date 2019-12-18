@@ -10,7 +10,7 @@
 
 //if not comment use define
 // set comment not use options
-#define VERSION "0.4"
+#define VERSION "0.6"
 //#define LOCATION "Saloon"
 // debug program
 //#define DEBUG_SW
