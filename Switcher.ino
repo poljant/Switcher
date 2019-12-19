@@ -5,7 +5,7 @@
 #include <Arduino.h>
 #include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
-//#include <ESP8266mDNS.h>
+#include <ESP8266mDNS.h>
 #include <functional>
 //#include <EEPROM.h>
 #include "../Switcher/WebPagers.h"
@@ -184,7 +184,7 @@ void setup() {
   wifiManager.autoConnect(hostname().c_str());
   delay(100);
 #endif
-
+  MDNS.begin(hostname(),WiFi.localIP());
 /*	DEBUGVAL(hostname());
 	DEBUGVAL(String(WiFi.macAddress()));
 	DEBUGVAL(hostname());
@@ -233,6 +233,6 @@ void loop() {
 	}
 #endif
 
-// MDNS.update();
+ MDNS.update();
 }
 

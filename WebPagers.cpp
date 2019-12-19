@@ -242,8 +242,12 @@ void setservers() {
 			});
 	server.on("/get", []()      // pobierz dane
 			{
+		String sget = r.isOn()? "1\r\n" : "0\r\n";
+#ifdef THERMOMETER
+			sget += String(temp)+ "\r\n";
+#endif
 
-				server.send(200, "text/html", ((r.isOn() ? "1, " : "0, ")+String(temp)));
+				server.send(200, "text/html", sget);
 			});
 //  /// WEBPAGEWIFISCAN
 #ifdef WEBPAGEWIFISCAN
