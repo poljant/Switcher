@@ -13,23 +13,20 @@
 #define VERSION "0.6"
 //#define LOCATION "Saloon"
 // debug program
-//#define DEBUG_SW
-/*
-#ifdef DEBUG_SW
-#define DEBUG Serial.print
-#define DEBUGLN Serial.println
+//#define DEBUG
+#ifdef DEBUG
+#define DEBUG_OUT Serial.print
+#define DEBUG_OUTLN Serial.println
 #else
-#define DEBUG
-#define DEBUGLN
+#define DEBUG_OUT
+#define DEBUG_OUTLN
 #endif
-*/
-// add function Alexa system
-//#define ALEXA
 //add WebPage WiFi scan
 #define WEBPAGEWIFISCAN
 //add WebPage button set switch
 #define WEBPAGESWITCH
 //set static IP ( no DHCP)
+// set IP in file Switcher.ino (lines 50 - 52)
 //#define IP_STATIC
 //add manual button
 #define BUTTON
@@ -37,10 +34,5 @@
 #define HOSTNAME "Switcher"
 //Thermometer
 //#define THERMOMETER
-
-
-
-
-
 
 #endif /* SWITCHER_H_ */

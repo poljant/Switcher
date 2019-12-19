@@ -11,7 +11,6 @@
 //#include <ESP8266WiFi.h>
 #include <ESP8266WebServer.h>
 #include <ESP8266HTTPUpdateServer.h>
-//#include <EEPROM.h>
 #include "../Switcher/Switcher.h"
 #include "Relay.h"
 
@@ -22,32 +21,32 @@ extern float temp;
 // login i hasło do sytemu (dla update)
 const char* www_login = "admin";
 const char* www_pass = "esp8266";
- const char* ssid;
- const char* pass;
+const char* ssid;
+const char* pass;
 
 const char* xpass;
 const char* xssid;
-const char* modes[] = {"NULL","STA","AP","STA+AP"};
-const char* phymodes[] = { "","B", "G", "N"};
-const char* encrypType[] = {"OPEN", "WEP", "WPA", "WPA2", "WPA_WPA2"};
+const char* modes[] = { "NULL", "STA", "AP", "STA+AP" };
+const char* phymodes[] = { "", "B", "G", "N" };
+const char* encrypType[] = { "OPEN", "WEP", "WPA", "WPA2", "WPA_WPA2" };
 
 const int port = 80;                 // port serwera www
 ESP8266WebServer server(port);
 ESP8266HTTPUpdateServer httpUpdate;
 
 //unsigned int ilM=10;
-unsigned long fminutes( unsigned int ile) {
-	return (millis()+(1000*60*ile));
+unsigned long fminutes(unsigned int ile) {
+	return (millis() + (1000 * 60 * ile));
 }
 // funkcja zamieniająca adres IP na string
-String IPtoStr(IPAddress IP){
-  String result;
-  for (int i = 0; i < 4; ++i) {
-    result += String(IP[i]);
-    if (i < 3)
-      result += '.';
-  }
-  return result;
+String IPtoStr(IPAddress IP) {
+	String result;
+	for (int i = 0; i < 4; ++i) {
+		result += String(IP[i]);
+		if (i < 3)
+			result += '.';
+	}
+	return result;
 }
 
 //char* IPtoChar(int ip)
@@ -61,44 +60,45 @@ String IPtoStr(IPAddress IP){
 //  return ip_str;
 //}
 String HTMLHeader() {           //  nagłówek strony
-String  h =  F("<!DOCTYPE html>\n"
-   "<html>"
-   "<head>"
-   "<title>");
-  h += HOSTNAME;
-  h += F("</title>"
-  "<meta charset=\"utf-8\">"
-  "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
-  "<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css\" >"
-  "</head>"
-  "<body style=\"text-align: center;color: white; background: black;font-size: 1.5em;\">\n");
-  return h;
+	String h = F("<!DOCTYPE html>\n"
+			"<html>"
+			"<head>"
+			"<title>");
+	h += HOSTNAME;
+	h += F(	"</title>"
+			"<meta charset=\"utf-8\">"
+			"<meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">"
+			"<link rel=\"stylesheet\" href=\"https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css\" >"
+			"</head>"
+			"<body style=\"text-align: center;color: white; background: black;font-size: 1.5em;\">\n");
+	return h;
 }
 
 String HTMLFooter() {             //  stopka strony www
-String  f = F("<p>Jan Trzciński &copy; 2019 V-");
-	f +=VERSION;
-	f +=("</p></td></tr>"
-   "</body>\n"
-   "</html>\n");
-  return f;
+	String f = F("<p>Jan Trzciński &copy; 2019 V-");
+	f += VERSION;
+	f += ("</p></td></tr>"
+			"</body>\n"
+			"</html>\n");
+	return f;
 }
 
 String HTMLPage1() {      // pierwsza część strony www
-String t = F("<h1>");
-		t +=String(HOSTNAME);
-		t += F("</h1>");
+	String t = F("<h1>");
+	t += String(HOSTNAME);
+	t += F("</h1>");
 #ifdef THERMOMETER
  t += F("<p>Temperature: ");
  t += String(temp);
  t += F(" ºC</p>");
 #endif
-	t += ( (r.isOn()) ? F("<p><a href = \"/relay/0\"><button class=\"btn btn-danger\">Switch is ON</button></a></p>\n") \
-	    : F("<p><a href = \"/relay/1\"><button class=\"btn btn-success\">Switch is OFF</button></a></p>\n"));
+	t += ((r.isOn()) ?
+		F("<p><a href = \"/relay/0\"><button class=\"btn btn-danger\">Switch is ON</button></a></p>\n") :
+		F("<p><a href = \"/relay/1\"><button class=\"btn btn-success\">Switch is OFF</button></a></p>\n"));
 	t += F("<p><a href = \"/\"><button class=\"btn btn-info\">Reload</button></a></p>");
-
- return t;
+	return t;
 }
+
 #ifdef WEBPAGEWIFISCAN
 String HTMLWiFiScan(void){
 	String p="";
@@ -122,7 +122,7 @@ String HTMLWiFiScan(void){
       "<th style = \"text-align: center;\">RSSI</th><th>encryption</th><th>hidden</th><tr>");
 #endif
 	p +=F("</thead><tbody>");
-	 for (int i=0; i<n;i++){	//uint8_t
+	 for (unsigned int i=0; i<n;i++){	//uint8_t
 	 p += F("<tr><td>"
 	 "<form action=\"/wifiset\" metod=\"post\">"
 	 "<labe><input id=\"SSID\" type=\"radio\" name=\"SSID\" value=\"");
@@ -205,29 +205,22 @@ String HTMLWiFiScan1(void){
 #endif
 	return p;
 }
-String WebPageScan(){
-	return (HTMLHeader()+HTMLWiFiScan()+HTMLWiFiScan1()+HTMLFooter());
+String WebPageScan() {
+	return (HTMLHeader() + HTMLWiFiScan() + HTMLWiFiScan1() + HTMLFooter());
 }
 #endif
- String WebPage() {       // połącz wszystkie części strony www
+String WebPage() {       // połącz wszystkie części strony www
 
-  return (HTMLHeader()+HTMLPage1()+HTMLFooter());
- }
+	return (HTMLHeader() + HTMLPage1() + HTMLFooter());
+}
 // funkcja ustawia wszystkie strony www
 void setservers() {
 	httpUpdate.setup(&server, "/update", www_login, www_pass); // umożliwia aktualizację poprzez WiFi
 
 	server.on("/", []() {      // odświerz stronę www
 
-
 				server.send(200, "text/html", WebPage());
 			});
-
-// server.on("/login", [](){
-//   if(!server.authenticate(www_login, www_pass))
-//     return server.requestAuthentication();
-//   server.send(200, "text/html", WebPage());
-// });
 
 	server.on("/relay/0", [] ()     //  wyłącz przekaźnik 1
 			{
@@ -261,7 +254,6 @@ void setservers() {
 	{
 		//pobierz przysłane dane
 			String ESSID = server.arg("SSID");
-//		extern char pass;
 			String Epass = server.arg("password");
 
 			if (((sizeof(ESSID)>=4) && (sizeof(Epass)>=8))) { //pomiń gdy brak nazwy lub hasła
