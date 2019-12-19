@@ -30,15 +30,14 @@
 //add WebPage button set switch
 #define WEBPAGESWITCH
 //set static IP ( no DHCP)
-#define IP_STATIC
+//#define IP_STATIC
 //add manual button
 #define BUTTON
 //title you web page
 #define HOSTNAME "Switcher"
 //Thermometer
-#define THERMOMETER
-//use ArduinoOTA
-//#define USEOTA
+//#define THERMOMETER
+
 
 
 
